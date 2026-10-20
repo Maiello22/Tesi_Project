@@ -1,0 +1,40 @@
+clik_node:
+  ros__parameters:
+    use_sim_time: true
+
+    # Catena controllata: dalla base al frame ottico della camera sinistra della ZED.
+    # Cosi' l'obiettivo e' direttamente "dove deve stare la camera".
+    base_link: base_link
+    tip_link: zed_left_camera_frame_optical
+
+    control_rate: 200.0          # [Hz]
+    command_interface: position  # position -> forward_position_controller, velocity -> forward_velocity_controller
+    velocity_feedback_gain: 5.0  # solo in modalita' velocity: correzione della deriva [1/s]
+
+    # Guadagni: kd = 2*sqrt(kp) -> risposta a smorzamento critico (nessuna sovraelongazione)
+    kp_pos: 100.0
+    kd_pos: 20.0
+    kp_ori: 100.0
+    kd_ori: 20.0
+
+    # Pseudo-inversa smorzata (singolarita')
+    lambda_max: 0.10
+    manipulability_threshold: 0.03   # nella posa iniziale w ~ 0.07; disteso w -> 0
+    kd_null: 10.0                    # smorzamento nelle direzioni singolari [1/s]
+
+    # Saturazione dell'errore usato dalla legge (obiettivi lontani o irraggiungibili)
+    max_pos_error: 0.05     # [m]
+    max_ori_error: 0.30     # [rad]
+
+    # Rifiuta obiettivi troppo lontani dalla spalla (UR5e: sbraccio ~0.95 m)
+    shoulder_height: 0.1625 # [m] quota dell'asse shoulder_lift rispetto a base_link
+    max_reach: 0.95       # [m]
+
+    # Limiti
+    max_joint_vel: 1.0      # [rad/s]
+    max_joint_acc: 4.0      # [rad/s^2]
+
+    # Profilo quintico: la durata si adatta alla distanza
+    max_lin_vel: 0.15       # [m/s]
+    max_ang_vel: 0.6        # [rad/s]
+    min_duration: 1.0       # [s]

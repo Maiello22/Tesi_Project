@@ -1,0 +1,21 @@
+aruco_detector:
+  ros__parameters:
+    use_sim_time: true
+
+    # Topic della camera sinistra della ZED 2i simulata
+    image_topic: /zed/left/image
+    camera_info_topic: /zed/left/camera_info
+
+    # Dizionario del marker aruco_tag.png (verificato: ID 201 riconosciuto solo da questo)
+    dictionary: DICT_ARUCO_ORIGINAL
+
+    # Lato del quadrato nero in metri. aruco_tag.png non ha margine bianco:
+    # il quadrato nero occupa tutto il piano di 0.12 x 0.12 m del modello.
+    marker_size: 0.12
+
+    # ID da considerare. [-1] = tutti gli ID rilevati
+    marker_ids: [-1]
+
+    publish_tf: true            # TF zed_left_camera_frame_optical -> aruco_<id>
+    publish_debug_image: true   # /aruco/debug_image con assi, ID, distanza ed errore di riproiezione
+    tf_prefix: aruco_

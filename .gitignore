@@ -1,0 +1,13 @@
+# risultati delle ispezioni (foto e CSV)
+inspection_results/
+# Python
+__pycache__/
+*.pyc
+# editor / sistema
+.vscode/
+*.swp
+.DS_Store
+# eventuali build lanciate per errore qui dentro
+build/
+install/
+log/

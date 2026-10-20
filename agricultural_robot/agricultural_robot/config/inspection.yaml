@@ -1,0 +1,79 @@
+inspection_node:
+  ros__parameters:
+    use_sim_time: true
+
+    # Frame e topic
+    base_frame: base_link
+    camera_frame: zed_left_camera_frame_optical
+    markers_topic: /aruco/markers          # pubblicato da aruco_detector.py
+    image_topic: /zed/left/image
+    target_topic: /clik/target_pose
+
+    # ---- 1. Mappatura ----
+    # pose di scansione: camera a scan_radius dall'asse della base e a quota scan_height, con
+    # l'orientamento iniziale, ruotata attorno a Z della base. NON si usa la posa iniziale cosi'
+    # com'e': con initial_positions.yaml (braccio verticale) la camera e' a 0.998 m dalla spalla,
+    # oltre max_reach, e il CLIK rifiuterebbe tutte le pose.
+    # in ordine crescente: la base ruota sempre nello stesso verso, senza tornare indietro
+    scan_angles_deg: [-120.0, -60.0, 0.0, 60.0, 120.0, 180.0]
+    scan_radius: 0.45         # [m] distanza orizzontale camera-asse base; 0 = quella iniziale
+    scan_height: 0.75         # [m] quota della camera (centro marker a 0.75); 0 = quella iniziale
+    scan_tilt_deg: 5.0        # inclinazione verso il basso della camera in scansione
+    scan_dwell: 1.5           # [s] sosta a ogni posa per raccogliere rilevazioni
+    min_detections: 3         # sotto questa soglia il marker e' un falso positivo
+
+    # ---- 2. Classificazione ----
+    shoulder_height: 0.1625   # spalla UR5e (stessi valori di clik.yaml)
+    max_reach: 0.95
+
+    # ---- 3. Visita ----
+    approach_distances: [0.55, 0.30]   # tappe di raffinamento; l'ultima e' la distanza della foto
+    # viste oblique prima della foto: la camera ruota attorno alla verticale del marker e lo guarda
+    # da +-30 gradi. Solo le osservazioni con angolo di vista >= min_view_angle_deg stimano la
+    # normale: vista frontale l'errore e' 6-8 gradi, a 30 gradi meno di 1 (ambiguita' IPPE).
+    oblique_angles_deg: [-30.0, 30.0]
+    oblique_distance: 0.45    # [m]
+    min_view_angle_deg: 15.0
+    standoff_quat: [0.7071068, 0.7071068, 0.0, 0.0]   # camera nel frame marker (x y z w): Z camera = -Z marker
+    via_step_deg: 60.0        # spostamenti attorno alla base spezzati in passi da 60 gradi
+    via_tol: 0.03
+    max_wind_deg: 190.0       # rotazione totale massima attorno alla base rispetto all'inizio
+                              # (la spalla ha un limite di +-360 gradi: niente giri accumulati)
+
+    # arrivo: vicino al target E fermo
+    arrive_pos_tol: 0.02
+    arrive_ang_tol_deg: 5.0
+    still_vel: 0.002          # [m/s]
+    arrive_stable: 0.4        # [s]
+    min_motion_time: 1.2      # [s] il profilo quintico del CLIK dura almeno 1 s
+    motion_timeout: 30.0      # [s] per segmento
+
+    # misura del marker a braccio fermo
+    settle_time: 0.3
+    measure_window: 1.0
+    min_frames: 5
+
+    # ---- 4. Verifica e foto ----
+    verify_pos_tol: 0.002     # [m] errore marker-camera rispetto a (0, 0, 0.30)
+    verify_ang_tol_deg: 8.0   # angolo tra asse ottico e normale del marker MISURATO dalla camera:
+                              # vista frontale a 30 cm la stima ha un errore di 3-8 gradi
+                              # (ambiguita' IPPE), quindi serve solo a scartare errori grossolani.
+                              # Ignorato se la normale viene dalle viste oblique.
+    max_corrections: 2
+    # una sottocartella <data_ora> per ogni esecuzione, con le foto e rapporto.csv.
+    # ~/ros2_ws/src e' la cartella montata dall'host: sul PC i risultati sono in
+    # ~/tesi_ws/inspection_results (il nodo ci mette un COLCON_IGNORE per la build)
+    photo_dir: ~/ros2_ws/src/inspection_results
+
+    # ---- Ground truth (solo simulazione) ----
+    # posa dei modelli nel mondo, come in worlds/multi_marker.sdf: [id, x, y, yaw, ...]
+    # Il rapporto riporta l'errore VERO della posa di foto (distanza, laterale, angolo).
+    # Per default.sdf: [201.0, 0.0, 1.0, 1.5708]. Per disattivare: [-1.0]
+    gt_markers: [201.0, 0.0, 1.0, 1.5708,
+                 202.0, 0.7794, 0.45, 0.5236,
+                 203.0, -1.1258, 0.65, 2.618,
+                 204.0, 0.0, -2.30, -1.5708]
+    gt_marker_offset: [-0.016, 0.0, 0.75]   # centro del marker nel frame del modello
+
+    start_delay: 3.0
+    rate: 20.0

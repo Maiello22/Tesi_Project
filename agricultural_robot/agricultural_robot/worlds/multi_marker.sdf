@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <world name="inspection">
+
+    <plugin filename="ignition-gazebo-physics-system"
+            name="ignition::gazebo::systems::Physics"/>
+    <plugin filename="ignition-gazebo-user-commands-system"
+            name="ignition::gazebo::systems::UserCommands"/>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system"
+            name="ignition::gazebo::systems::SceneBroadcaster"/>
+    <plugin filename="ignition-gazebo-sensors-system"
+            name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.8 0.95 1</background>
+      <sky></sky>
+      <grid>false</grid>
+    </scene>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <material>
+            <ambient>0.35 0.45 0.25 1</ambient>
+            <diffuse>0.35 0.45 0.25 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Prova di ispezione multi-marker. Ogni cartello e' rivolto verso la base del robot:
+         il marker guarda verso -X del modello, quindi yaw = azimut della posizione.
+         Distanza della posa di foto (30 cm davanti al marker) dalla spalla (0, 0, 0.1625):
+           201  r = 1.00 m, azimut  90 deg  -> 0.91 m  raggiungibile (stessa posizione di default.sdf)
+           202  r = 0.90 m, azimut  30 deg  -> 0.84 m  raggiungibile
+           203  r = 1.30 m, azimut 150 deg  -> 1.16 m  fuori portata (visibile in scansione)
+           204  r = 2.30 m, azimut -90 deg  -> troppo lontano per essere rilevato -->
+    <include>
+      <uri>model://aruco_tag</uri>
+      <name>aruco_tag_201</name>
+      <pose>0.0 1.0 0 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>model://aruco_tag_202</uri>
+      <name>aruco_tag_202</name>
+      <pose>0.7794 0.45 0 0 0 0.5236</pose>
+    </include>
+    <include>
+      <uri>model://aruco_tag_203</uri>
+      <name>aruco_tag_203</name>
+      <pose>-1.1258 0.65 0 0 0 2.618</pose>
+    </include>
+    <include>
+      <uri>model://aruco_tag_204</uri>
+      <name>aruco_tag_204</name>
+      <pose>0.0 -2.30 0 0 0 -1.5708</pose>
+    </include>
+
+  </world>
+</sdf>

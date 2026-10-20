@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+  <!--
+    Cartello con marker ArUco (ID 202). Centro del marker a 0.75 m da terra.
+    Origine del modello = punto in cui il palo tocca il terreno (Z = 0).
+    Il marker guarda verso -X del modello: nel mondo si orienta solo con lo yaw.
+  -->
+  <model name="aruco_tag_202">
+    <static>true</static>
+    <link name="link">
+
+      <!-- Basetta a terra (da 0 a 0.01 m) -->
+      <visual name="base_visual">
+        <pose>0.03 0 0.005 0 0 0</pose>
+        <geometry><box><size>0.16 0.16 0.01</size></box></geometry>
+        <material>
+          <ambient>0.25 0.25 0.25 1</ambient>
+          <diffuse>0.3 0.3 0.3 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- Palo: da terra (Z=0) fino al centro del cartello (Z=0.75), DIETRO il cartello (+X) -->
+      <visual name="pole_visual">
+        <pose>0.03 0 0.375 0 0 0</pose>
+        <geometry><cylinder><radius>0.02</radius><length>0.75</length></cylinder></geometry>
+        <material>
+          <ambient>0.3 0.3 0.3 1</ambient>
+          <diffuse>0.4 0.4 0.4 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+
+      <!-- Cartello in legno 3 x 20 x 20 cm, centrato a Z=0.75: il retro (X=+0.015) tocca il palo (palo di raggio 2 cm con asse a X=0.03: entra di 5 mm nel retro del cartello, che risulta fissato) -->
+      <visual name="board_visual">
+        <pose>0 0 0.75 0 0 0</pose>
+        <geometry><box><size>0.03 0.2 0.2</size></box></geometry>
+        <material>
+          <ambient>0.45 0.25 0.1 1</ambient>
+          <diffuse>0.55 0.3 0.12 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+
+      <!-- Marker sulla faccia frontale (X=-0.015), 1 mm davanti per evitare z-fighting.
+           pitch +90° porta la normale del piano su +X, yaw 180° la gira su -X -->
+      <visual name="aruco_visual">
+        <pose>-0.016 0 0.75 0 1.5708 3.14159</pose>
+        <geometry>
+          <plane><normal>0 0 1</normal><size>0.12 0.12</size></plane>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://aruco_tag_202/aruco_tag_202.png</albedo_map>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <!-- Collisioni -->
+      <collision name="base_collision">
+        <pose>0.03 0 0.005 0 0 0</pose>
+        <geometry><box><size>0.16 0.16 0.01</size></box></geometry>
+      </collision>
+      <collision name="pole_collision">
+        <pose>0.03 0 0.375 0 0 0</pose>
+        <geometry><cylinder><radius>0.02</radius><length>0.75</length></cylinder></geometry>
+      </collision>
+      <collision name="board_collision">
+        <pose>0 0 0.75 0 0 0</pose>
+        <geometry><box><size>0.03 0.2 0.2</size></box></geometry>
+      </collision>
+
+    </link>
+  </model>
+</sdf>
